@@ -15,6 +15,26 @@ def db_connect():
 
 
 
+def export_csv_to_sql(path_to_file, table_name, index, columns_names=[],
+                    rename_column={}):
+    """ Функция переводит csv файл в базу данных """
+    file = path_to_file
+    df = pd.read_csv(file) # создает DataFrame файл
+
+    #определяем названия колонок при разных заданных аргументах
+    if columns_names:
+        df.columns=[c.lower() for c in columns_names]
+    else:
+        df.columns = [c.lower() for c in df.columns]
+    if rename_column:
+        df.rename(columns=rename_column, inplace=True)
+    # проверяем наличие таблицы и, если существует, проверяем новый файл на уникальность строк    
+    if exists_table(db_connect(), table_name) :
+        df = unique_lines_only(df, table_name, db_connect(), list(df.columns))
+
+    df.to_sql(table_name, db_connect(), if_exists='append', index=index)
+
+
 
 def main(path_to_file, format, table_name, index=False, sheet=1,
          columns_names=[], rename_column={} ):
