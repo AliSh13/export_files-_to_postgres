@@ -28,6 +28,32 @@ def export_csv_to_sql(path_to_file, table_name, index, columns_names=[],
         df.columns = [c.lower() for c in df.columns]
     if rename_column:
         df.rename(columns=rename_column, inplace=True)
+    # проверяем наличие таблицы и, если существует, проверяем новый файл на уникальность строк
+    if exists_table(db_connect(), table_name) :
+        df = unique_lines_only(df, table_name, db_connect(), list(df.columns))
+
+    df.to_sql(table_name, db_connect(), if_exists='append', index=index)
+
+
+def export_excel_to_sql(path_to_file, table_name, index, sheet=1,
+                        columns_names=[], rename_column={}):
+    """ Функция переводит excel файл в базу данных """
+    wb = load_workbook(path_to_file)
+    #читаем определенный лист документ ( по умолчанию - 1 )
+    sheet = wb.get_sheet_by_name(wb.get_sheet_names()[sheet-1])
+    data = list(sheet.values)
+    df = pd.DataFrame(data)
+
+    #определяем названия колонок при разных заданных аргументах
+    if columns_names:
+        df.columns=[c.lower() for c in columns_names]
+    else:
+        cols = data[0]
+        data = data[1:]
+        df = pd.DataFrame(data, columns=cols)
+        df.columns = [c.lower() for c in df.columns]
+    if rename_column:
+        df.rename(columns=rename_column, inplace=True)
     # проверяем наличие таблицы и, если существует, проверяем новый файл на уникальность строк    
     if exists_table(db_connect(), table_name) :
         df = unique_lines_only(df, table_name, db_connect(), list(df.columns))
