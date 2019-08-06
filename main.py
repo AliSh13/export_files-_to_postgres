@@ -12,7 +12,19 @@ def db_connect():
     conn = create_engine(f'postgresql://{user}:{password}@{host}/{name_db}')
     return conn
 
+def exists_table(con, table_name):
+    """ проверка существования таблицы """
+    exists = False
+    ex = con.execute(f"SELECT EXISTS (SELECT relname FROM pg_class WHERE relname='{table_name}')")
+    exists = ex.fetchone()[0]
 
+    return exists
+
+def unique_lines_only(df, tablename, engine, dup_cols=[]):
+    """ Проверяет строки нового файла и таблицы бд, оставляет только уникальные строки """
+    args = 'SELECT %s FROM %s' %(', '.join(['"{0}"'.format(col) for col in dup_cols]), tablename)
+    df.drop_duplicates(dup_cols, keep='last', inplace=True)
+    df = pd.merge(df, pd.read_sql(args, engine), how='left', on=dup_cols, indicator=True)
 
 
 def export_csv_to_sql(path_to_file, table_name, index, columns_names=[],
