@@ -1,0 +1,10 @@
+app:
+  restart: always
+  build: .
+  ports:
+    - 5000:5000
+  volumes:
+    - .:/app
+  depends_on:
+    - postgres
+  entrypoint: ["python", "manage.py","runserver"]
