@@ -1,0 +1,31 @@
+<html>
+        <body>
+            <h1>Save file in db demo</h1>
+
+            <form action="/transform" method="post" enctype="multipart/form-data">
+                <input type="file" name="data_file" required />
+                <p>Имя таблиц:<input required type="text" name="table_name" /></p>
+
+                <p><select size="2" multiple required name="format">
+                <option disabled>Выберите формат</option>
+                <option value="csv">csv</option>
+                <option value="xlsx">xlsx</option>
+                </select></p>
+
+                <p>Индексация: <input type="checkbox" name="index" value="True"></p>
+
+                <p>Номер страницы(только для xmlx, по умолчанию - 1):
+                <input type="number" min=1 max=100 step =1 name="sheet" />
+
+                <p>Задать имена для столбцов(имя1, имя2, ...)
+                    <input type="text" name="columns_names" />
+                </p>
+
+                <p>Переиеновать столбцы(Старое название: новое, ...)
+                <input type="text" name="rename_column" />
+                </p>
+
+                <input type="submit" />
+            </form>
+        </body>
+    </html>
